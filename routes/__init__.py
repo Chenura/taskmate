@@ -15,6 +15,11 @@ def register_blueprints(app):
     # Main dashboard route
     from flask import render_template
     from flask_login import login_required
+    from datetime import datetime, timezone
+
+    @app.context_processor
+    def inject_now():
+        return {"now": datetime.now(timezone.utc).replace(tzinfo=None)}
 
     @app.route("/")
     @login_required
