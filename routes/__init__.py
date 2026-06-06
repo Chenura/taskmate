@@ -25,3 +25,21 @@ def register_blueprints(app):
     @login_required
     def dashboard():
         return render_template("dashboard.html")
+
+    # Debug endpoint - remove after fixing
+    @app.route("/debug/db")
+    def debug_db():
+        from flask import jsonify
+        from app import db
+        import traceback, sys
+        try:
+            from models import Task, Note, Reminder
+            db.create_all()
+            return jsonify({"status": "ok", "tables": "created"})
+        except Exception as e:
+            return jsonify({
+                "status": "error",
+                "error": str(e),
+                "traceback": traceback.format_exc(),
+                "python": sys.version,
+            })

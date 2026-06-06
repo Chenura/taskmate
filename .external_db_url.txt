@@ -1,0 +1,1 @@
+postgresql://taskmate_db_zl7y_user:***@dpg-d8hsgbu47okc738qod10-a.oregon-postgres.render.com:5432/taskmate_db_zl7y
