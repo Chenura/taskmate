@@ -17,6 +17,11 @@ def register_blueprints(app):
     from flask_login import login_required
     from datetime import datetime, timezone
 
+    # Make sure instance dir exists for SQLite
+    import os
+    instance_dir = os.path.join(app.root_path, 'instance')
+    os.makedirs(instance_dir, exist_ok=True)
+
     @app.context_processor
     def inject_now():
         return {"now": datetime.now(timezone.utc).replace(tzinfo=None)}
