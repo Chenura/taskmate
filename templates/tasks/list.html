@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Tasks{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>✅ Tasks</h1>
+    <a href="{{ url_for('tasks.create_task') }}" class="btn btn-primary">+ New Task</a>
+</div>
+
+<div class="filter-bar">
+    <a href="{{ url_for('tasks.list_tasks', filter='all') }}" class="filter-chip {% if current_filter == 'all' %}active{% endif %}">All</a>
+    <a href="{{ url_for('tasks.list_tasks', filter='pending') }}" class="filter-chip {% if current_filter == 'pending' %}active{% endif %}">Pending</a>
+    <a href="{{ url_for('tasks.list_tasks', filter='completed') }}" class="filter-chip {% if current_filter == 'completed' %}active{% endif %}">Completed</a>
+    {% if categories %}
+    <span class="filter-divider">|</span>
+    {% for cat in categories %}
+    <a href="{{ url_for('tasks.list_tasks', filter=current_filter, category=cat) }}" class="filter-chip category-chip {% if current_category == cat %}active{% endif %}">{{ cat }}</a>
+    {% endfor %}
+    {% if current_category %}
+    <a href="{{ url_for('tasks.list_tasks', filter=current_filter) }}" class="filter-chip clear-chip">✕ clear</a>
+    {% endif %}
+    {% endif %}
+</div>
+
+<div class="task-list">
+    {% if tasks %}
+    {% for task in tasks %}
+    <div class="card task-card {% if task.is_complete %}completed{% endif %} {% if task.due_date and task.due_date < now and not task.is_complete %}overdue{% endif %}">
+        <div class="task-check">
+            <form method="POST" action="{{ url_for('tasks.toggle_task', task_id=task.id) }}" class="toggle-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="check-btn {% if task.is_complete %}checked{% endif %}" title="Toggle completion">
+                    {% if task.is_complete %}✓{% else %}○{% endif %}
+                </button>
+            </form>
+        </div>
+        <div class="task-body">
+            <div class="task-title-row">
+                <span class="task-title {% if task.is_complete %}struck{% endif %}">{{ task.title }}</span>
+                <span class="priority-badge priority-{{ task.priority }}">{{ task.priority }}</span>
+                {% if task.category %}
+                <span class="category-badge">{{ task.category }}</span>
+                {% endif %}
+            </div>
+            {% if task.description %}
+            <p class="task-desc">{{ task.description[:120] }}{% if task.description|length > 120 %}…{% endif %}</p>
+            {% endif %}
+            <div class="task-meta">
+                {% if task.due_date %}
+                <span class="due-date {% if task.due_date < now and not task.is_complete %}overdue{% endif %}">
+                    Due: {{ task.due_date.strftime('%b %d, %Y') }}
+                </span>
+                {% endif %}
+                <span class="created-date">Created: {{ task.created_at.strftime('%b %d') }}</span>
+            </div>
+        </div>
+        <div class="task-actions">
+            <a href="{{ url_for('tasks.edit_task', task_id=task.id) }}" class="btn btn-sm btn-ghost" title="Edit">✏️</a>
+            <form method="POST" action="{{ url_for('tasks.delete_task', task_id=task.id) }}" class="inline-form delete-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-sm btn-ghost btn-danger" title="Delete" onclick="return confirm('Delete this task?')">🗑️</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="empty-state-full">
+        <p class="empty-icon">✅</p>
+        <h3>No tasks found</h3>
+        <p>
+            {% if current_filter == 'pending' %}All tasks are complete! 🎉
+            {% elif current_filter == 'completed' %}No completed tasks yet.
+            {% else %}Create your first task to get started.{% endif %}
+        </p>
+        <a href="{{ url_for('tasks.create_task') }}" class="btn btn-primary">Create Task</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

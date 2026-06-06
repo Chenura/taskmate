@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Dashboard</h1>
+    <p class="subtitle">Welcome back, {{ current_user.username }}!</p>
+</div>
+
+<div class="dashboard-grid">
+    <section class="card dashboard-card">
+        <div class="card-header">
+            <h2>✅ Tasks</h2>
+            <a href="{{ url_for('tasks.create_task') }}" class="btn btn-sm btn-primary">+ New</a>
+        </div>
+        <div class="card-body">
+            {% set pending_count = current_user.tasks.filter_by(is_complete=False).count() %}
+            {% if pending_count > 0 %}
+            <div class="stat-row">
+                <span class="stat-label">Pending</span>
+                <span class="stat-badge pending">{{ pending_count }}</span>
+            </div>
+            <ul class="compact-list">
+                {% for task in current_user.tasks.filter_by(is_complete=False).order_by(Task.created_at.desc()).limit(5) %}
+                <li class="compact-item {% if task.due_date and task.due_date < now and not task.is_complete %}overdue{% endif %}">
+                    <span class="priority-dot priority-{{ task.priority }}"></span>
+                    <a href="{{ url_for('tasks.list_tasks') }}">{{ task.title }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="empty-state">No pending tasks. You're all caught up! 🎉</p>
+            {% endif %}
+        </div>
+        <div class="card-footer">
+            <a href="{{ url_for('tasks.list_tasks') }}">View all tasks →</a>
+        </div>
+    </section>
+
+    <section class="card dashboard-card">
+        <div class="card-header">
+            <h2>📝 Recent Notes</h2>
+            <a href="{{ url_for('notes.create_note') }}" class="btn btn-sm btn-primary">+ New</a>
+        </div>
+        <div class="card-body">
+            {% set notes = current_user.notes.order_by(Note.updated_at.desc()).limit(5).all() %}
+            {% if notes %}
+            <ul class="compact-list">
+                {% for note in notes %}
+                <li class="compact-item">
+                    <a href="{{ url_for('notes.view_note', note_id=note.id) }}">{{ note.title }}</a>
+                    <small>{{ note.updated_at.strftime('%b %d, %Y') }}</small>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="empty-state">No notes yet. Start writing!</p>
+            {% endif %}
+        </div>
+        <div class="card-footer">
+            <a href="{{ url_for('notes.list_notes') }}">View all notes →</a>
+        </div>
+    </section>
+
+    <section class="card dashboard-card">
+        <div class="card-header">
+            <h2>🔔 Upcoming Reminders</h2>
+            <a href="{{ url_for('reminders.create_reminder') }}" class="btn btn-sm btn-primary">+ New</a>
+        </div>
+        <div class="card-body">
+            {% set reminders = current_user.reminders.filter_by(is_fired=False).order_by(Reminder.reminder_datetime.asc()).limit(5).all() %}
+            {% if reminders %}
+            <ul class="compact-list">
+                {% for reminder in reminders %}
+                <li class="compact-item">
+                    <span class="reminder-icon">🔔</span>
+                    <span>{{ reminder.title }}</span>
+                    <small>{{ reminder.reminder_datetime.strftime('%b %d, %I:%M %p') }}</small>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="empty-state">No upcoming reminders.</p>
+            {% endif %}
+        </div>
+        <div class="card-footer">
+            <a href="{{ url_for('reminders.list_reminders') }}">View all reminders →</a>
+        </div>
+    </section>
+</div>
+{% endblock %}

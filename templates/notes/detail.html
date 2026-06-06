@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ note.title }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>{{ note.title }}</h1>
+    <div class="header-actions">
+        <a href="{{ url_for('notes.edit_note', note_id=note.id) }}" class="btn btn-primary">✏️ Edit</a>
+        <form method="POST" action="{{ url_for('notes.delete_note', note_id=note.id) }}" class="inline-form delete-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this note?')">🗑️ Delete</button>
+        </form>
+        <a href="{{ url_for('notes.list_notes') }}" class="btn btn-ghost">← Back</a>
+    </div>
+</div>
+
+<div class="note-detail card">
+    <div class="note-meta-bar">
+        <span>Created: {{ note.created_at.strftime('%b %d, %Y at %I:%M %p') }}</span>
+        <span>Updated: {{ note.updated_at.strftime('%b %d, %Y at %I:%M %p') }}</span>
+    </div>
+    <div class="note-content">
+        {{ note.content | replace('\n', '<br>') | safe }}
+    </div>
+</div>
+{% endblock %}

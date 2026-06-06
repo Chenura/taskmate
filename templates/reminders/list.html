@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Reminders{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>🔔 Reminders</h1>
+    <a href="{{ url_for('reminders.create_reminder') }}" class="btn btn-primary">+ New Reminder</a>
+</div>
+
+<div class="reminder-list">
+    {% if reminders %}
+    <div class="reminder-section">
+        <h2 class="section-title">Upcoming</h2>
+        {% for reminder in reminders if not reminder.is_fired %}
+        <div class="card reminder-card {% if reminder.reminder_datetime < now %}past-due{% endif %}">
+            <div class="reminder-body">
+                <div class="reminder-title">{{ reminder.title }}</div>
+                <div class="reminder-meta">
+                    <span class="reminder-datetime">
+                        📅 {{ reminder.reminder_datetime.strftime('%b %d, %Y at %I:%M %p') }}
+                    </span>
+                    {% if reminder.task %}
+                    <span class="linked-task">→ Task: {{ reminder.task.title }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="reminder-actions">
+                <form method="POST" action="{{ url_for('reminders.fire_reminder', reminder_id=reminder.id) }}" class="inline-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-sm btn-primary" title="Mark as done">✓ Done</button>
+                </form>
+                <a href="{{ url_for('reminders.edit_reminder', reminder_id=reminder.id) }}" class="btn btn-sm btn-ghost">✏️</a>
+                <form method="POST" action="{{ url_for('reminders.delete_reminder', reminder_id=reminder.id) }}" class="inline-form delete-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-sm btn-ghost btn-danger" onclick="return confirm('Delete this reminder?')">🗑️</button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <p class="empty-state">All caught up! No upcoming reminders.</p>
+        {% endfor %}
+    </div>
+
+    <div class="reminder-section">
+        <h2 class="section-title">Completed</h2>
+        {% for reminder in reminders if reminder.is_fired %}
+        <div class="card reminder-card fired">
+            <div class="reminder-body">
+                <div class="reminder-title struck">{{ reminder.title }}</div>
+                <div class="reminder-meta">
+                    <span class="reminder-datetime">
+                        📅 {{ reminder.reminder_datetime.strftime('%b %d, %Y at %I:%M %p') }}
+                    </span>
+                </div>
+            </div>
+            <div class="reminder-actions">
+                <form method="POST" action="{{ url_for('reminders.delete_reminder', reminder_id=reminder.id) }}" class="inline-form delete-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-sm btn-ghost btn-danger" onclick="return confirm('Delete this reminder?')">🗑️</button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <p class="empty-state">No completed reminders.</p>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state-full">
+        <p class="empty-icon">🔔</p>
+        <h3>No reminders yet</h3>
+        <p>Set reminders for important tasks and events.</p>
+        <a href="{{ url_for('reminders.create_reminder') }}" class="btn btn-primary">Create Reminder</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

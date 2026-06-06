@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskMate — {% block title %}Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        {% if current_user.is_authenticated %}
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>📋 TaskMate</h2>
+                <button class="sidebar-close" id="sidebarClose">&times;</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}" class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                    📊 Dashboard
+                </a>
+                <a href="{{ url_for('tasks.list_tasks') }}" class="nav-item {% if request.endpoint and request.endpoint.startswith('tasks.') %}active{% endif %}">
+                    ✅ Tasks
+                </a>
+                <a href="{{ url_for('notes.list_notes') }}" class="nav-item {% if request.endpoint and request.endpoint.startswith('notes.') %}active{% endif %}">
+                    📝 Notes
+                </a>
+                <a href="{{ url_for('reminders.list_reminders') }}" class="nav-item {% if request.endpoint and request.endpoint.startswith('reminders.') %}active{% endif %}">
+                    🔔 Reminders
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <span class="user-greeting">👋 {{ current_user.username }}</span>
+                <a href="{{ url_for('auth.logout') }}" class="nav-item logout-link">🚪 Logout</a>
+            </div>
+        </aside>
+        <button class="hamburger" id="hamburger">☰</button>
+        {% endif %}
+        <main class="main-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-container">
+                {% for category, message in messages %}
+                <div class="flash flash-{{ category }}">
+                    <span>{{ message }}</span>
+                    <button class="flash-close">&times;</button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
