@@ -30,6 +30,9 @@ def create_app(config_class=Config):
         register_blueprints(app)
 
         from models import Task, Note, Reminder  # noqa
-        db.create_all()
+        try:
+            db.create_all()
+        except Exception as e:
+            app.logger.warning(f"Database init warning: {e}")
 
     return app
