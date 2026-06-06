@@ -24,7 +24,13 @@ def register_blueprints(app):
 
     @app.context_processor
     def inject_now():
-        return {"now": datetime.now(timezone.utc).replace(tzinfo=None)}
+        from models import Task, Note, Reminder
+        return {
+            "now": datetime.now(timezone.utc).replace(tzinfo=None),
+            "Task": Task,
+            "Note": Note,
+            "Reminder": Reminder,
+        }
 
     @app.route("/")
     @login_required
