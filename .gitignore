@@ -7,10 +7,24 @@ build/
 .eggs/
 venv/
 .env
+.env.*
 
 # Flask
 instance/
 *.db
+
+# Render temp files
+db_conn.json
+.db_pwd_marker
+.db_env_payload.json
+.url_template.txt
+.url_fmt.txt
+check_render.py
+check_events.py
+gen_payload.py
+gen_payload2.py
+deploy_wait.py
+set_env.py
 
 # IDE
 .vscode/
@@ -21,6 +35,3 @@ instance/
 # OS
 .DS_Store
 Thumbs.db
-
-# Render
-.env.*
