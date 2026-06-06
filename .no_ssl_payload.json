@@ -1,1 +1,0 @@
-[{"key": "DATABASE_URL", "value": "postgresql://taskmate_db_zl7y_user:QLeT0sVJCI3KiGrVJOdMrvCm0kISOYee@dpg-d8hsgbu47okc738qod10-a.oregon-postgres.render.com:5432/taskmate_db_zl7y"}, {"key": "SECRET_KEY", "value": "c0cc4c266a1901eb46663b515923ea0939a92c8764435392eb5ee8b9dcaf1500"}]
