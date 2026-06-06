@@ -30,7 +30,12 @@ def create_app(config_class=Config):
         register_blueprints(app)
 
         from models import Task, Note, Reminder  # noqa
-        db.create_all()
-        app.logger.info("Database tables created/verified")
+        try:
+            db.create_all()
+            app.logger.info("Database tables created/verified")
+        except Exception as e:
+            import traceback
+            app.logger.error(f"DB init failed: {e}")
+            app.logger.error(traceback.format_exc())
 
     return app
